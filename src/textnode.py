@@ -11,7 +11,7 @@ class TextType(Enum):
 
 
 class TextNode:
-    """Inline text definition class"""
+    """Inline text definition class, takes text, text_type and url as arguments"""
     def __init__(self, text: str, text_type: TextType, url = None):
         self.text = text
         self.text_type = text_type
