@@ -18,10 +18,7 @@ class HTMLNode:
         return res
     
     def __repr__(self):
-        return f"Tag: {self.tag}\n\
-            Value: {self.value}\n\
-            Children: {self.children}\n\
-            Props: {self.props}\n"
+        return f"Tag: {self.tag}\nValue: {self.value}\nChildren: {self.children}\nProps: {self.props}\n"
     
 class LeafNode(HTMLNode):
     """Leaf node class, represents last nodes in an html tree structure"""
@@ -40,3 +37,21 @@ class LeafNode(HTMLNode):
             Value: {self.value}\n\
             Props: {self.props}\n"
         
+class ParentNode(HTMLNode):
+    """Parent node class, represents nodes with children"""
+    def __init__(self, tag, children, props = None):
+        super().__init__(tag, None, children, props)
+
+    def to_html(self):
+        if not self.tag:
+            raise ValueError("Parent node must have a tag")
+        if not self.children:
+            raise ValueError("Parent node must have children")
+        
+        res = f"<{self.tag}{self.props_to_html()}>"
+        for child in self.children:
+            res += child.to_html()
+
+        res += f"</{self.tag}>"
+
+        return res
