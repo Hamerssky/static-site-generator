@@ -12,7 +12,7 @@ class TextType(Enum):
 
 class TextNode:
     """Inline text definition class"""
-    def __init__(self, text, text_type: TextType, url = None):
+    def __init__(self, text: str, text_type: TextType, url = None):
         self.text = text
         self.text_type = text_type
         self.url = url
