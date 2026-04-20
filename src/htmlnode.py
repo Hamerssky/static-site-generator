@@ -28,7 +28,7 @@ class LeafNode(HTMLNode):
         super().__init__(tag, value, None, props)
 
     def to_html(self):
-        if not self.value:
+        if self.value is None:
             raise ValueError("All leaf nodes must have a value")
         if not self.tag:
             return self.value
@@ -39,7 +39,7 @@ class LeafNode(HTMLNode):
         
 class ParentNode(HTMLNode):
     """Parent node class, represents nodes with children"""
-    def __init__(self, tag, children, props = None):
+    def __init__(self, tag, children: list, props = None):
         super().__init__(tag, None, children, props)
 
     def to_html(self):

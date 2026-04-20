@@ -24,12 +24,7 @@ def block_to_block_type(block: str):
         return None
 
     # Heading block
-    if block.startswith("#"):
-        level = 1
-
-        while len(block) > level and block[level] == "#" and level < 6:
-            level += 1
-        
+    if block.startswith("#"):        
         return BlockType.HEADING
     
     # Code block

@@ -198,3 +198,6 @@ class TestSplitNodesLinksImages(unittest.TestCase):
             TextNode("img", TextType.IMAGE, "url"),
             TextNode(" more text", TextType.TEXT),
         ])
+
+if __name__ == "__main__":
+    unittest.main()
