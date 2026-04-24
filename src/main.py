@@ -17,14 +17,14 @@ def clone_to_path(source_path, dest_path):
         raise ValueError("Invalid source path")
     
     for path in os.listdir(source_path):
-        source = f"{source_path}/{path}"
-        dest = f"{dest_path}/{path}"
+        source = os.path.join(source_path, path)
+        dest = os.path.join(dest_path, path)
         print(f"Cloning {source} to {dest}")
         if os.path.isfile(source):
             shutil.copy(source, dest)
-            continue
-        os.makedirs(dest)
-        clone_to_path(source, dest)
+        else:
+            os.makedirs(dest)
+            clone_to_path(source, dest)
 
 def extract_title(markdown):
     for line in markdown.split("\n"):
@@ -46,15 +46,28 @@ def generate_page(from_path, template_path, dest_path):
     page = template.replace("{{ Title }}", title).replace("{{ Content }}", html)
 
     os.makedirs(dest_path, exist_ok = True)
-    with open(f"{dest_path}/index.html", "w") as file:
+    with open(os.path.join(dest_path, "index.html"), "w") as file:
         file.write(page)
 
     print("Successfully generated the page")
 
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+    for filename in os.listdir(dir_path_content):
+        src_path = os.path.join(dir_path_content, filename)
+        dest_path = os.path.join(dest_dir_path, filename)
+
+        if os.path.isdir(src_path):
+            print(f"Creating directory: {dest_path}")
+            os.makedirs(dest_path, exist_ok=True)
+            generate_pages_recursive(src_path, template_path, dest_path)
+        else:
+            generate_page(src_path, template_path, dest_dir_path)
+
+
 def main():
     print("Executing main function")
     clone_static_public()
-    generate_page("./content/index.md", "./template.html", "./public")
+    generate_pages_recursive("./content", "./template.html", "./public")
 
 if __name__ == "__main__":
     main()
