@@ -11,7 +11,7 @@ def clone_static(basepath, folder_name):
     os.makedirs(path)
     print(f"Creating {folder_name} directory")
 
-    clone_to_path(os.path.join(basepath, "static"), os.path.join(basepath, "public"))
+    clone_to_path(os.path.join(basepath, "static"), os.path.join(basepath, folder_name))
 
     print("Successfully cloned")
 
@@ -74,13 +74,16 @@ def main():
     basepath = args.basepath
 
     print("Executing main function")
-    clone_static(basepath, "public")
+
+    clone_to = "docs"
+
+    clone_static(basepath, clone_to)
 
     content_path = os.path.join(basepath, "content")
     template_file = os.path.join(basepath, "template.html")
-    public_path = os.path.join(basepath, "public")
+    cloned_path = os.path.join(basepath, clone_to)
     
-    generate_pages_recursive(content_path, template_file, public_path, basepath)
+    generate_pages_recursive(content_path, template_file, cloned_path, basepath)
 
     print("Done")
 
