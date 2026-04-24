@@ -1,14 +1,17 @@
 import os
 import shutil
 from markdown_to_html_node import markdown_to_html_node
+import argparse
 
-def clone_static_public():
-    shutil.rmtree(f"./public")
-    print(f"Deleting public")
-    os.makedirs("./public/")
-    print("Creating public directory")
+def clone_static(basepath, folder_name):
+    path = os.path.join(basepath, folder_name)
+    if os.path.exists(path):
+        shutil.rmtree(path)
+        print(f"Deleting {folder_name}")
+    os.makedirs(path)
+    print(f"Creating {folder_name} directory")
 
-    clone_to_path("./static", "./public")
+    clone_to_path(os.path.join(basepath, "static"), os.path.join(basepath, "public"))
 
     print("Successfully cloned")
 
@@ -32,7 +35,7 @@ def extract_title(markdown):
             return line[2:]
     raise Exception("No title found")
 
-def generate_page(from_path, template_path, dest_path):
+def generate_page(from_path, template_path, dest_path, basepath):
     print(f"Generating page from {from_path} to {dest_path} using {template_path}")
 
     with open(from_path) as file:
@@ -43,7 +46,7 @@ def generate_page(from_path, template_path, dest_path):
     html = markdown_to_html_node(markdown).to_html()
     title = extract_title(markdown)
 
-    page = template.replace("{{ Title }}", title).replace("{{ Content }}", html)
+    page = template.replace("{{ Title }}", title).replace("{{ Content }}", html).replace('href="/', f'href="{basepath}').replace('src="/', f'src="{basepath}')
 
     os.makedirs(dest_path, exist_ok = True)
     with open(os.path.join(dest_path, "index.html"), "w") as file:
@@ -51,7 +54,7 @@ def generate_page(from_path, template_path, dest_path):
 
     print("Successfully generated the page")
 
-def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path, basepath):
     for filename in os.listdir(dir_path_content):
         src_path = os.path.join(dir_path_content, filename)
         dest_path = os.path.join(dest_dir_path, filename)
@@ -59,15 +62,27 @@ def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
         if os.path.isdir(src_path):
             print(f"Creating directory: {dest_path}")
             os.makedirs(dest_path, exist_ok=True)
-            generate_pages_recursive(src_path, template_path, dest_path)
+            generate_pages_recursive(src_path, template_path, dest_path, basepath)
         else:
-            generate_page(src_path, template_path, dest_dir_path)
+            generate_page(src_path, template_path, dest_dir_path, basepath)
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("basepath", nargs = "?", default = "/")
+    args = parser.parse_args()
+    basepath = args.basepath
+
     print("Executing main function")
-    clone_static_public()
-    generate_pages_recursive("./content", "./template.html", "./public")
+    clone_static(basepath, "public")
+
+    content_path = os.path.join(basepath, "content")
+    template_file = os.path.join(basepath, "template.html")
+    public_path = os.path.join(basepath, "public")
+    
+    generate_pages_recursive(content_path, template_file, public_path, basepath)
+
+    print("Done")
 
 if __name__ == "__main__":
     main()
