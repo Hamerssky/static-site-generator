@@ -3,7 +3,7 @@ import shutil
 from markdown_to_html_node import markdown_to_html_node
 import argparse
 
-def clone_static(basepath, folder_name):
+def clone_static(folder_name):
     path = folder_name
     if os.path.exists(path):
         shutil.rmtree(path)
@@ -85,7 +85,7 @@ def main():
 
     clone_to = "docs"
 
-    clone_static(basepath, clone_to)
+    clone_static(clone_to)
 
     content_path = "content"
     template_file = "template.html"
