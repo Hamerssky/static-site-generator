@@ -4,14 +4,14 @@ from markdown_to_html_node import markdown_to_html_node
 import argparse
 
 def clone_static(basepath, folder_name):
-    path = os.path.join(basepath, folder_name)
+    path = folder_name
     if os.path.exists(path):
         shutil.rmtree(path)
         print(f"Deleting {folder_name}")
     os.makedirs(path)
     print(f"Creating {folder_name} directory")
 
-    clone_to_path(os.path.join(basepath, "static"), os.path.join(basepath, "public"))
+    clone_to_path("static", folder_name)
 
     print("Successfully cloned")
 
@@ -36,7 +36,7 @@ def extract_title(markdown):
     raise Exception("No title found")
 
 def generate_page(from_path, template_path, dest_path, basepath):
-    print(f"Generating page from {from_path} to {dest_path} using {template_path}")
+    print(f"Generating page from {from_path} to {dest_path}")
 
     with open(from_path) as file:
         markdown = file.read()
@@ -46,9 +46,17 @@ def generate_page(from_path, template_path, dest_path, basepath):
     html = markdown_to_html_node(markdown).to_html()
     title = extract_title(markdown)
 
-    page = template.replace("{{ Title }}", title).replace("{{ Content }}", html).replace('href="/', f'href="{basepath}').replace('src="/', f'src="{basepath}')
+    if basepath == "/":
+        basepath = ""
+    else:
+        basepath = "/" + basepath.strip("/") + "/"
 
-    os.makedirs(dest_path, exist_ok = True)
+    page = template.replace("{{ Title }}", title)\
+                   .replace("{{ Content }}", html)\
+                   .replace('href="/', f'href="{basepath}')\
+                   .replace('src="/', f'src="{basepath}')
+
+    os.makedirs(dest_path, exist_ok=True)
     with open(os.path.join(dest_path, "index.html"), "w") as file:
         file.write(page)
 
@@ -74,13 +82,16 @@ def main():
     basepath = args.basepath
 
     print("Executing main function")
-    clone_static(basepath, "public")
 
-    content_path = os.path.join(basepath, "content")
-    template_file = os.path.join(basepath, "template.html")
-    public_path = os.path.join(basepath, "public")
+    clone_to = "docs"
+
+    clone_static(basepath, clone_to)
+
+    content_path = "content"
+    template_file = "template.html"
+    cloned_path = clone_to
     
-    generate_pages_recursive(content_path, template_file, public_path, basepath)
+    generate_pages_recursive(content_path, template_file, cloned_path, basepath)
 
     print("Done")
 
